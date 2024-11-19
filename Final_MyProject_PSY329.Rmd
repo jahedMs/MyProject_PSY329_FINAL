@@ -83,6 +83,6 @@ EFA(list_projectdata, vars=c("PEERCIV_1T1", "PEERCIV_2T1", "PEERCIV_3T1"), metho
 
 ```{r}
 #FA of PARCIVT1/Parental civic involvement
-EFA(list_projectdata, vars=c("PARCIV_1T1", "PARCIV_4T1", "PARCIV_2T1", "PARCIV_3T1"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
+EFA(list_projectdata, vars=c("PARCIV_1T1", "PARCIV_2T1", "PARCIV_3T1", "PARCIV_4T1"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
 ```
 
