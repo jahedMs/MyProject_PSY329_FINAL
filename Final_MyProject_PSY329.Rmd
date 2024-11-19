@@ -1,0 +1,88 @@
+---
+title: "Final Version of MyProject_PSY329"
+author: "Mursal Jahed"
+date: "2024-10-11"
+output: "github_document"
+---
+Load packages
+```{r}
+library(haven)
+library(dplyr)
+library(ggplot2)
+library(tidyr) 
+library(psych)
+library(car)
+library(lmtest)
+library(performance)
+library(sjPlot)
+library(bruceR)
+```
+
+Load dataset
+```{r}
+load("/Users/mursal_j/Downloads/ICPSR_36561/DS0001/36561-0001-Data.rda")
+```
+
+Select variables
+```{r}
+list_projectdata <- da36561.0001 %>% 
+  select(PEERCIVACT1, PEERVAL_2T1, PEERVAL_4T1, PEERVAL_5T1, PARCIVT1, PARCIV_1T1, PARCIV_4T1, PARCIV_2T1, PARCIV_3T1, COMMMEANT1, YIIACTS_3T1, YIIACTS_5T1, YIIACTS_11T1, YIIACTS_13T1, YIIACTS_15T1, PEERINVT1, PEERCIV_1T1, PEERCIV_2T1, PEERCIV_3T1, GENDERT1, GRADET1, CRITNEWST1, CRITNEWS_1T1, CRITNEWS_2T1)
+```
+
+Checking for Assumptions
+```{r}
+model <- lm(COMMMEANT1 ~ PARCIVT1 + PEERINVT1, data = list_projectdata)
+check_model(model)
+summary(model)
+```
+Analysis - How do parental vs peer civic involvement influence civic involvement in teenagers?
+```{r}
+plot_model(model,  type ="est",  show.values = TRUE, vline.color = "#1B191999", line.size = 1.5, dot.size = 2.5, colors = "blue")
+tab_model(model)
+```
+
+Analysis - How does this relationship change if the teens' critical news consumption is taken into account?
+Checking assumptions
+```{r}
+model <- lm(COMMMEANT1 ~ CRITNEWST1 + PARCIVT1 + PEERINVT1, data = list_projectdata)
+check_model(model)
+summary(model)
+```
+Analysis
+```{r}
+plot_model(model, type = "est", show.values = TRUE, vline.color = "#1B191999", 
+           line.size = 1.5, dot.size = 2.5, colors = "blue", 
+           terms = c("CRITNEWST1", "PARCIVT1", "PEERINVT1"))
+tab_model(model)
+```
+
+Testing reliability
+```{r}
+#Reliability of COMMMEANT1/Teen community service
+Alpha(list_projectdata, vars=c("YIIACTS_3T1", "YIIACTS_5T1", "YIIACTS_11T1", "YIIACTS_13T1", "YIIACTS_15T1"))
+#Reliability of PEERINVT1/Peer civic involvement
+Alpha(list_projectdata, vars=c("PEERCIV_1T1", "PEERCIV_2T1", "PEERCIV_3T1"))
+#Reliability of PARCIVT1/Parental civic involvement
+Alpha(list_projectdata, vars=c("PARCIV_1T1", "PARCIV_4T1", "PARCIV_2T1", "PARCIV_3T1"))
+#Reliability of CRITNEWST1 (Spearman's Rho) - need to create a data set and only select those two
+spearman_for_critnewst1 <- da36561.0001 %>% 
+  select(CRITNEWS_1T1, CRITNEWS_2T1)
+Corr(spearman_for_critnewst1, method = "spearman")
+```
+Factor Analysis
+```{r}
+#FA of COMMMEANT1/Teen community service
+EFA(list_projectdata, vars=c("YIIACTS_3T1", "YIIACTS_5T1", "YIIACTS_11T1", "YIIACTS_13T1", "YIIACTS_15T1"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
+```
+
+```{r}
+#FA of PEERCIVACT1/Peer civic involvement
+EFA(list_projectdata, vars=c("PEERCIV_1T1", "PEERCIV_2T1", "PEERCIV_3T1"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
+
+```
+
+```{r}
+#FA of PARCIVT1/Parental civic involvement
+EFA(list_projectdata, vars=c("PARCIV_1T1", "PARCIV_4T1", "PARCIV_2T1", "PARCIV_3T1"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
+```
+
