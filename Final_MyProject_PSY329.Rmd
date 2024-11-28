@@ -26,7 +26,7 @@ load("/Users/mursal_j/Downloads/ICPSR_36561/DS0001/36561-0001-Data.rda")
 Select variables
 ```{r}
 list_projectdata <- da36561.0001 %>% 
-  select(PEERCIVACT1, PEERVAL_2T1, PEERVAL_4T1, PEERVAL_5T1, PARCIVT1, PARCIV_1T1, PARCIV_4T1, PARCIV_2T1, PARCIV_3T1, COMMMEANT1, YIIACTS_3T1, YIIACTS_5T1, YIIACTS_11T1, YIIACTS_13T1, YIIACTS_15T1, PEERINVT1, PEERCIV_1T1, PEERCIV_2T1, PEERCIV_3T1, GENDERT1, GRADET1, CRITNEWST1, CRITNEWS_1T1, CRITNEWS_2T1)
+  select(PARCIVT1, PARCIV_1T1, PARCIV_4T1, PARCIV_2T1, PARCIV_3T1, COMMMEANT1, YIIACTS_3T1, YIIACTS_5T1, YIIACTS_11T1, YIIACTS_13T1, YIIACTS_15T1, PEERINVT1, PEERCIV_1T1, PEERCIV_2T1, PEERCIV_3T1, GENDERT1, GRADET1, CRITNEWST1, CRITNEWS_1T1, CRITNEWS_2T1, AGE_YEART1)
 
 #rename variables for easier interpretation
 list_projectdata <- list_projectdata %>%
@@ -40,6 +40,15 @@ list_projectdata <- list_projectdata %>%
 colnames(list_projectdata)
 
 ```
+Demographics
+```{r}
+mean_age <- mean(list_projectdata$AGE_YEART1, na.rm = TRUE)
+print(mean_age)
+gender_counts <- table(list_projectdata$GENDERT1)
+print(gender)
+gender_percent <- prop.table(gender_counts) * 100
+print(gender_percent)
+```
 
 Checking for Assumptions
 ```{r}
@@ -49,7 +58,7 @@ summary(model)
 ```
 Analysis - How do parental vs peer civic involvement influence civic involvement in teenagers?
 ```{r}
-plot_model(model,  type ="est",  show.values = TRUE, vline.color = "#1B191999", line.size = 1.5, dot.size = 2.5, colors = "blue")+ggtitle("Effect of Parental and Peer Civic Involvement on Teen Civic Involvement") +
+plot_model(model,  type ="est",  show.values = TRUE, vline.color = "#1B191999", line.size = 1.5, dot.size = 2.5, colors = "blue")+ ggtitle("Parental and Peer Influence on Teen Civic Involvement") +
   xlab("Predictors") +  # Label for x-axis
   ylab("Estimates (Effect Size)")
 tab_model(model)
@@ -67,7 +76,9 @@ Analysis
 ```{r}
 plot_model(model, type = "est", show.values = TRUE, vline.color = "#1B191999", 
            line.size = 1.5, dot.size = 2.5, colors = "blue", 
-           terms = c("Critical_News_Consumption", "Parental_Civic_Involvement", "Peer_Civic_Involvement"))
+           terms = c("Critical_News_Consumption", "Parental_Civic_Involvement", "Peer_Civic_Involvement")) + ggtitle("Critial News Consumption Influences Teen Civic Involvement") +
+  xlab("Predictors") +  # Label for x-axis
+  ylab("Estimates (Effect Size)")
 tab_model(model)
 ```
 
