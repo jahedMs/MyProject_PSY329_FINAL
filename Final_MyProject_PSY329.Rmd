@@ -28,13 +28,13 @@ Select variables
 list_projectdata <- da36561.0001 %>% 
   select(PARCIVT1, PARCIV_1T1, PARCIV_4T1, PARCIV_2T1, PARCIV_3T1, COMMMEANT1, YIIACTS_3T1, YIIACTS_5T1, YIIACTS_11T1, YIIACTS_13T1, YIIACTS_15T1, PEERINVT1, PEERCIV_1T1, PEERCIV_2T1, PEERCIV_3T1, GENDERT1, GRADET1, CRITNEWST1, CRITNEWS_1T1, CRITNEWS_2T1, AGE_YEART1)
 
-#rename variables for easier interpretation
+#rename variables for easier interpretation & conciseness
 list_projectdata <- list_projectdata %>%
   rename(
-    Teen_Civic_Involvement = COMMMEANT1,
-    Parental_Civic_Involvement = PARCIVT1,
-    Peer_Civic_Involvement = PEERINVT1,
-    Critical_News_Consumption = CRITNEWST1
+    Teen_Civic_Engagement = COMMMEANT1,
+    Parents = PARCIVT1,
+    Peers = PEERINVT1,
+    Critical_Consumption = CRITNEWST1
   )
 
 colnames(list_projectdata)
@@ -45,30 +45,29 @@ Demographics
 mean_age <- mean(list_projectdata$AGE_YEART1, na.rm = TRUE)
 print(mean_age)
 gender_counts <- table(list_projectdata$GENDERT1)
-print(gender)
+print(gender_counts)
 gender_percent <- prop.table(gender_counts) * 100
 print(gender_percent)
 ```
 
 Checking for Assumptions
 ```{r}
-model <- lm(Teen_Civic_Involvement ~ Parental_Civic_Involvement + Peer_Civic_Involvement, data = list_projectdata)
+model <- lm(Teen_Civic_Engagement ~ Parents + Peers, data = list_projectdata)
 check_model(model)
 summary(model)
 ```
 Analysis - How do parental vs peer civic involvement influence civic involvement in teenagers?
 ```{r}
-plot_model(model,  type ="est",  show.values = TRUE, vline.color = "#1B191999", line.size = 1.5, dot.size = 2.5, colors = "blue")+ ggtitle("Parental and Peer Influence on Teen Civic Involvement") +
+plot_model(model,  type ="est",  show.values = TRUE, vline.color = "#1B191999", line.size = 1.5, dot.size = 2.5, colors = "blue")+ theme_classic() + ggtitle("Parental and Peer Influence on Teen Civic Engagement") +
   xlab("Predictors") +  # Label for x-axis
-  ylab("Estimates (Effect Size)")
+  ylab("Estimates")
 tab_model(model)
-
 ```
 
 Analysis - How does this relationship change if the teens' critical news consumption is taken into account?
 Checking assumptions
 ```{r}
-model <- lm(Teen_Civic_Involvement ~ Critical_News_Consumption + Parental_Civic_Involvement + Peer_Civic_Involvement, data = list_projectdata)
+model <- lm(Teen_Civic_Engagement ~ Critical_Consumption + Parents + Peers, data = list_projectdata)
 check_model(model)
 summary(model)
 ```
@@ -76,28 +75,33 @@ Analysis
 ```{r}
 plot_model(model, type = "est", show.values = TRUE, vline.color = "#1B191999", 
            line.size = 1.5, dot.size = 2.5, colors = "blue", 
-           terms = c("Critical_News_Consumption", "Parental_Civic_Involvement", "Peer_Civic_Involvement")) + ggtitle("Critial News Consumption Influences Teen Civic Involvement") +
+           terms = c("Critical_Consumption", "Parents", "Peers")) + theme_classic() + ggtitle("Critial News Consumption Influences Teen Civic Involvement") +
   xlab("Predictors") +  # Label for x-axis
-  ylab("Estimates (Effect Size)")
+  ylab("Estimates")
 tab_model(model)
 ```
 
 Testing reliability
 ```{r}
-#Reliability of Teen_Civic_Involvement/Teen community service
+#Reliability of Teen_Civic_Engagement/Teen community service
 Alpha(list_projectdata, vars=c("YIIACTS_3T1", "YIIACTS_5T1", "YIIACTS_11T1", "YIIACTS_13T1", "YIIACTS_15T1"))
-#Reliability of Peer_Civic_Involvement/Peer civic involvement
+#Reliability of Peers/Peer civic involvement
 Alpha(list_projectdata, vars=c("PEERCIV_1T1", "PEERCIV_2T1", "PEERCIV_3T1"))
-#Reliability of Parental_Civic_Involvement/Parental civic involvement
+#Reliability of Parents/Parental civic involvement
 Alpha(list_projectdata, vars=c("PARCIV_1T1", "PARCIV_4T1", "PARCIV_2T1", "PARCIV_3T1"))
-#Reliability of Critical_News_Consumption (Spearman's Rho) - need to create a data set and only select those two
-spearman_for_Critical_News_Consumption <- da36561.0001 %>% 
-  select(CRITNEWS_1T1, CRITNEWS_2T1)
-Corr(spearman_for_Critical_News_Consumption, method = "spearman")
 ```
+Reliability of Critical_Consumption (Spearman's Rho)
+```{r}
+# need to create a data set and only select those two
+spearman_for_Critical_Consumption <- da36561.0001 %>% 
+  select(CRITNEWS_1T1, CRITNEWS_2T1)
+Corr(spearman_for_Critical_Consumption, method = "spearman")
+```
+
+
 Factor Analysis
 ```{r}
-#FA of Teen_Civic_Involvement/Teen community service
+#FA of COMMMEANT1/Teen community service
 EFA(list_projectdata, vars=c("YIIACTS_3T1", "YIIACTS_5T1", "YIIACTS_11T1", "YIIACTS_13T1", "YIIACTS_15T1"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
 ```
 
@@ -108,7 +112,7 @@ EFA(list_projectdata, vars=c("PEERCIV_1T1", "PEERCIV_2T1", "PEERCIV_3T1"), metho
 ```
 
 ```{r}
-#FA of Parental_Civic_Involvement/Parental civic involvement
+#FA of PARCIVT1/Parental civic involvement
 EFA(list_projectdata, vars=c("PARCIV_1T1", "PARCIV_2T1", "PARCIV_3T1", "PARCIV_4T1"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
 ```
 

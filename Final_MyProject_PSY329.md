@@ -129,41 +129,63 @@ Select variables
 
 ``` r
 list_projectdata <- da36561.0001 %>% 
-  select(PEERCIVACT1, PEERVAL_2T1, PEERVAL_4T1, PEERVAL_5T1, PARCIVT1, PARCIV_1T1, PARCIV_4T1, PARCIV_2T1, PARCIV_3T1, COMMMEANT1, YIIACTS_3T1, YIIACTS_5T1, YIIACTS_11T1, YIIACTS_13T1, YIIACTS_15T1, PEERINVT1, PEERCIV_1T1, PEERCIV_2T1, PEERCIV_3T1, GENDERT1, GRADET1, CRITNEWST1, CRITNEWS_1T1, CRITNEWS_2T1)
+  select(PARCIVT1, PARCIV_1T1, PARCIV_4T1, PARCIV_2T1, PARCIV_3T1, COMMMEANT1, YIIACTS_3T1, YIIACTS_5T1, YIIACTS_11T1, YIIACTS_13T1, YIIACTS_15T1, PEERINVT1, PEERCIV_1T1, PEERCIV_2T1, PEERCIV_3T1, GENDERT1, GRADET1, CRITNEWST1, CRITNEWS_1T1, CRITNEWS_2T1, AGE_YEART1)
 
-#rename variables for easier interpretation
+#rename variables for easier interpretation & conciseness
 list_projectdata <- list_projectdata %>%
   rename(
-    Teen_Civic_Involvement = COMMMEANT1,
-    Parental_Civic_Involvement = PARCIVT1,
-    Peer_Civic_Involvement = PEERINVT1,
-    Critical_News_Consumption = CRITNEWST1
+    Teen_Civic_Engagement = COMMMEANT1,
+    Parents = PARCIVT1,
+    Peers = PEERINVT1,
+    Critical_Consumption = CRITNEWST1
   )
 
 colnames(list_projectdata)
 ```
 
-    ##  [1] "PEERCIVACT1"                "PEERVAL_2T1"               
-    ##  [3] "PEERVAL_4T1"                "PEERVAL_5T1"               
-    ##  [5] "Parental_Civic_Involvement" "PARCIV_1T1"                
-    ##  [7] "PARCIV_4T1"                 "PARCIV_2T1"                
-    ##  [9] "PARCIV_3T1"                 "Teen_Civic_Involvement"    
-    ## [11] "YIIACTS_3T1"                "YIIACTS_5T1"               
-    ## [13] "YIIACTS_11T1"               "YIIACTS_13T1"              
-    ## [15] "YIIACTS_15T1"               "Peer_Civic_Involvement"    
-    ## [17] "PEERCIV_1T1"                "PEERCIV_2T1"               
-    ## [19] "PEERCIV_3T1"                "GENDERT1"                  
-    ## [21] "GRADET1"                    "Critical_News_Consumption" 
-    ## [23] "CRITNEWS_1T1"               "CRITNEWS_2T1"
+    ##  [1] "Parents"               "PARCIV_1T1"            "PARCIV_4T1"           
+    ##  [4] "PARCIV_2T1"            "PARCIV_3T1"            "Teen_Civic_Engagement"
+    ##  [7] "YIIACTS_3T1"           "YIIACTS_5T1"           "YIIACTS_11T1"         
+    ## [10] "YIIACTS_13T1"          "YIIACTS_15T1"          "Peers"                
+    ## [13] "PEERCIV_1T1"           "PEERCIV_2T1"           "PEERCIV_3T1"          
+    ## [16] "GENDERT1"              "GRADET1"               "Critical_Consumption" 
+    ## [19] "CRITNEWS_1T1"          "CRITNEWS_2T1"          "AGE_YEART1"
+
+Demographics
+
+``` r
+mean_age <- mean(list_projectdata$AGE_YEART1, na.rm = TRUE)
+print(mean_age)
+```
+
+    ## [1] 16.87276
+
+``` r
+gender_counts <- table(list_projectdata$GENDERT1)
+print(gender_counts)
+```
+
+    ## 
+    ##   (0) Male (1) Female 
+    ##        754        811
+
+``` r
+gender_percent <- prop.table(gender_counts) * 100
+print(gender_percent)
+```
+
+    ## 
+    ##   (0) Male (1) Female 
+    ##   48.17891   51.82109
 
 Checking for Assumptions
 
 ``` r
-model <- lm(Teen_Civic_Involvement ~ Parental_Civic_Involvement + Peer_Civic_Involvement, data = list_projectdata)
+model <- lm(Teen_Civic_Engagement ~ Parents + Peers, data = list_projectdata)
 check_model(model)
 ```
 
-![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 summary(model)
@@ -171,18 +193,17 @@ summary(model)
 
     ## 
     ## Call:
-    ## lm(formula = Teen_Civic_Involvement ~ Parental_Civic_Involvement + 
-    ##     Peer_Civic_Involvement, data = list_projectdata)
+    ## lm(formula = Teen_Civic_Engagement ~ Parents + Peers, data = list_projectdata)
     ## 
     ## Residuals:
     ##      Min       1Q   Median       3Q      Max 
     ## -2.05818 -0.49009  0.03388  0.50710  2.11368 
     ## 
     ## Coefficients:
-    ##                            Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                 1.49570    0.07186  20.816   <2e-16 ***
-    ## Parental_Civic_Involvement  0.05260    0.02316   2.271   0.0233 *  
-    ## Peer_Civic_Involvement      0.33802    0.02205  15.327   <2e-16 ***
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)  1.49570    0.07186  20.816   <2e-16 ***
+    ## Parents      0.05260    0.02316   2.271   0.0233 *  
+    ## Peers        0.33802    0.02205  15.327   <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -195,12 +216,12 @@ Analysis - How do parental vs peer civic involvement influence civic
 involvement in teenagers?
 
 ``` r
-plot_model(model,  type ="est",  show.values = TRUE, vline.color = "#1B191999", line.size = 1.5, dot.size = 2.5, colors = "blue")+ggtitle("Effect of Parental and Peer Civic Involvement on Teen Civic Involvement") +
+plot_model(model,  type ="est",  show.values = TRUE, vline.color = "#1B191999", line.size = 1.5, dot.size = 2.5, colors = "blue")+ theme_classic() + ggtitle("Parental and Peer Influence on Teen Civic Engagement") +
   xlab("Predictors") +  # Label for x-axis
-  ylab("Estimates (Effect Size)")
+  ylab("Estimates")
 ```
 
-![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 tab_model(model)
@@ -212,7 +233,7 @@ tab_model(model)
  
 </th>
 <th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
-Teen_Civic_Involvement
+Teen_Civic_Engagement
 </th>
 </tr>
 <tr>
@@ -245,7 +266,7 @@ p
 </tr>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-Parental Civic<br>Involvement
+Parents
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 0.05
@@ -259,7 +280,7 @@ Parental Civic<br>Involvement
 </tr>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-Peer Civic Involvement
+Peers
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 0.34
@@ -293,11 +314,11 @@ Analysis - How does this relationship change if the teens’ critical news
 consumption is taken into account? Checking assumptions
 
 ``` r
-model <- lm(Teen_Civic_Involvement ~ Critical_News_Consumption + Parental_Civic_Involvement + Peer_Civic_Involvement, data = list_projectdata)
+model <- lm(Teen_Civic_Engagement ~ Critical_Consumption + Parents + Peers, data = list_projectdata)
 check_model(model)
 ```
 
-![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 summary(model)
@@ -305,19 +326,19 @@ summary(model)
 
     ## 
     ## Call:
-    ## lm(formula = Teen_Civic_Involvement ~ Critical_News_Consumption + 
-    ##     Parental_Civic_Involvement + Peer_Civic_Involvement, data = list_projectdata)
+    ## lm(formula = Teen_Civic_Engagement ~ Critical_Consumption + Parents + 
+    ##     Peers, data = list_projectdata)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
     ## -2.0548 -0.4843  0.0286  0.4884  2.0147 
     ## 
     ## Coefficients:
-    ##                            Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                 1.33121    0.07650  17.402  < 2e-16 ***
-    ## Critical_News_Consumption   0.10577    0.01818   5.818 7.38e-09 ***
-    ## Parental_Civic_Involvement  0.03427    0.02311   1.483    0.138    
-    ## Peer_Civic_Involvement      0.30247    0.02266  13.346  < 2e-16 ***
+    ##                      Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)           1.33121    0.07650  17.402  < 2e-16 ***
+    ## Critical_Consumption  0.10577    0.01818   5.818 7.38e-09 ***
+    ## Parents               0.03427    0.02311   1.483    0.138    
+    ## Peers                 0.30247    0.02266  13.346  < 2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -331,10 +352,12 @@ Analysis
 ``` r
 plot_model(model, type = "est", show.values = TRUE, vline.color = "#1B191999", 
            line.size = 1.5, dot.size = 2.5, colors = "blue", 
-           terms = c("Critical_News_Consumption", "Parental_Civic_Involvement", "Peer_Civic_Involvement"))
+           terms = c("Critical_Consumption", "Parents", "Peers")) + theme_classic() + ggtitle("Critial News Consumption Influences Teen Civic Involvement") +
+  xlab("Predictors") +  # Label for x-axis
+  ylab("Estimates")
 ```
 
-![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 tab_model(model)
@@ -346,7 +369,7 @@ tab_model(model)
  
 </th>
 <th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
-Teen_Civic_Involvement
+Teen_Civic_Engagement
 </th>
 </tr>
 <tr>
@@ -379,7 +402,7 @@ p
 </tr>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-Critical News Consumption
+Critical Consumption
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 0.11
@@ -393,7 +416,7 @@ Critical News Consumption
 </tr>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-Parental Civic<br>Involvement
+Parents
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 0.03
@@ -407,7 +430,7 @@ Parental Civic<br>Involvement
 </tr>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-Peer Civic Involvement
+Peers
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 0.30
@@ -440,7 +463,7 @@ R<sup>2</sup> / R<sup>2</sup> adjusted
 Testing reliability
 
 ``` r
-#Reliability of Teen_Civic_Involvement/Teen community service
+#Reliability of Teen_Civic_Engagement/Teen community service
 Alpha(list_projectdata, vars=c("YIIACTS_3T1", "YIIACTS_5T1", "YIIACTS_11T1", "YIIACTS_13T1", "YIIACTS_15T1"))
 ```
 
@@ -472,7 +495,7 @@ Alpha(list_projectdata, vars=c("YIIACTS_3T1", "YIIACTS_5T1", "YIIACTS_11T1", "YI
     ## Item-Rest Cor. = Corrected Item-Total Correlation
 
 ``` r
-#Reliability of Peer_Civic_Involvement/Peer civic involvement
+#Reliability of Peers/Peer civic involvement
 Alpha(list_projectdata, vars=c("PEERCIV_1T1", "PEERCIV_2T1", "PEERCIV_3T1"))
 ```
 
@@ -502,7 +525,7 @@ Alpha(list_projectdata, vars=c("PEERCIV_1T1", "PEERCIV_2T1", "PEERCIV_3T1"))
     ## Item-Rest Cor. = Corrected Item-Total Correlation
 
 ``` r
-#Reliability of Parental_Civic_Involvement/Parental civic involvement
+#Reliability of Parents/Parental civic involvement
 Alpha(list_projectdata, vars=c("PARCIV_1T1", "PARCIV_4T1", "PARCIV_2T1", "PARCIV_3T1"))
 ```
 
@@ -532,11 +555,13 @@ Alpha(list_projectdata, vars=c("PARCIV_1T1", "PARCIV_4T1", "PARCIV_2T1", "PARCIV
     ## ─────────────────────────────────────────────────────
     ## Item-Rest Cor. = Corrected Item-Total Correlation
 
+Reliability of Critical_Consumption (Spearman’s Rho)
+
 ``` r
-#Reliability of Critical_News_Consumption (Spearman's Rho) - need to create a data set and only select those two
-spearman_for_Critical_News_Consumption <- da36561.0001 %>% 
+# need to create a data set and only select those two
+spearman_for_Critical_Consumption <- da36561.0001 %>% 
   select(CRITNEWS_1T1, CRITNEWS_2T1)
-Corr(spearman_for_Critical_News_Consumption, method = "spearman")
+Corr(spearman_for_Critical_Consumption, method = "spearman")
 ```
 
     ## NOTE: `CRITNEWS_1T1`, `CRITNEWS_2T1` transformed to numeric.
@@ -548,14 +573,14 @@ Corr(spearman_for_Critical_News_Consumption, method = "spearman")
     ## CRITNEWS_1T1-CRITNEWS_2T1  0.61 [0.58, 0.64] <.001 *** 1546
     ## ───────────────────────────────────────────────────────────
 
-![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
     ## Correlation matrix is displayed in the RStudio `Plots` Pane.
 
 Factor Analysis
 
 ``` r
-#FA of Teen_Civic_Involvement/Teen community service
+#FA of COMMMEANT1/Teen community service
 EFA(list_projectdata, vars=c("YIIACTS_3T1", "YIIACTS_5T1", "YIIACTS_11T1", "YIIACTS_13T1", "YIIACTS_15T1"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
 ```
 
@@ -601,7 +626,7 @@ EFA(list_projectdata, vars=c("YIIACTS_3T1", "YIIACTS_5T1", "YIIACTS_11T1", "YIIA
     ## Communality = Sum of Squared (SS) Factor Loadings
     ## (Uniqueness = 1 - Communality)
 
-![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 #FA of PEERCIVACT1/Peer civic involvement
@@ -646,10 +671,10 @@ EFA(list_projectdata, vars=c("PEERCIV_1T1", "PEERCIV_2T1", "PEERCIV_3T1"), metho
     ## Communality = Sum of Squared (SS) Factor Loadings
     ## (Uniqueness = 1 - Communality)
 
-![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
-#FA of Parental_Civic_Involvement/Parental civic involvement
+#FA of PARCIVT1/Parental civic involvement
 EFA(list_projectdata, vars=c("PARCIV_1T1", "PARCIV_2T1", "PARCIV_3T1", "PARCIV_4T1"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
 ```
 
@@ -693,4 +718,4 @@ EFA(list_projectdata, vars=c("PARCIV_1T1", "PARCIV_2T1", "PARCIV_3T1", "PARCIV_4
     ## Communality = Sum of Squared (SS) Factor Loadings
     ## (Uniqueness = 1 - Communality)
 
-![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](Final_MyProject_PSY329_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
